@@ -12,6 +12,7 @@ import {
   sendReaction,
   startMatch,
   subscribeConnectionStatus,
+  subscribeRoomErrors,
   subscribeRoomState
 } from "../services/multiplayerSocket";
 import { hasCustomBackendUrl } from "../services/backendConfig";
@@ -49,8 +50,16 @@ export function MultiplayerScreen({ onBack }: Props): JSX.Element {
   useEffect(() => {
     const unsubscribe = subscribeRoomState((state) => {
       setRoomState(state);
+      setConnectionMessage("");
     });
 
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeRoomErrors((message) => {
+      setConnectionMessage(message);
+    });
     return unsubscribe;
   }, []);
 
@@ -74,6 +83,11 @@ export function MultiplayerScreen({ onBack }: Props): JSX.Element {
   }, []);
 
   function handleCreateRoom(): void {
+    if (!isConnected) {
+      setConnectionMessage("Not connected to multiplayer server");
+      return;
+    }
+
     const roomCode = Math.random().toString(36).slice(2, 7).toUpperCase();
     createRoom({
       roomCode,
@@ -83,8 +97,14 @@ export function MultiplayerScreen({ onBack }: Props): JSX.Element {
   }
 
   function handleJoinRoom(): void {
+    if (!isConnected) {
+      setConnectionMessage("Not connected to multiplayer server");
+      return;
+    }
+
     const roomCode = roomCodeInput.trim().toUpperCase();
     if (!ROOM_CODE_REGEX.test(roomCode)) {
+      setConnectionMessage("Invalid room code format");
       return;
     }
 
@@ -158,7 +178,12 @@ export function MultiplayerScreen({ onBack }: Props): JSX.Element {
               ))}
             </View>
 
-            <PrimaryButton label={t("createRoom")} onPress={handleCreateRoom} style={{ marginTop: 12 }} />
+            <PrimaryButton
+              label={t("createRoom")}
+              onPress={handleCreateRoom}
+              style={{ marginTop: 12 }}
+              disabled={!isConnected}
+            />
 
             <Text style={[styles.label, { color: theme.textPrimary, fontFamily: bodyFont }]}>
               {t("roomCode")}
@@ -175,7 +200,12 @@ export function MultiplayerScreen({ onBack }: Props): JSX.Element {
               autoCapitalize="characters"
               maxLength={8}
             />
-            <PrimaryButton label={t("joinRoom")} variant="outline" onPress={handleJoinRoom} />
+            <PrimaryButton
+              label={t("joinRoom")}
+              variant="outline"
+              onPress={handleJoinRoom}
+              disabled={!isConnected}
+            />
           </>
         )}
 

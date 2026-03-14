@@ -96,6 +96,7 @@ io.on("connection", (socket) => {
   socket.on("room:create", (payload) => {
     const { roomCode, quizType, player } = payload || {};
     if (!roomCode || !player || !player.id) {
+      socket.emit("room:error", { message: "Invalid room payload" });
       return;
     }
 
@@ -127,6 +128,7 @@ io.on("connection", (socket) => {
     const normalizedRoomCode = String(roomCode || "").toUpperCase();
     const room = rooms.get(normalizedRoomCode);
     if (!room || !player || !player.id) {
+      socket.emit("room:error", { message: "Room not found. Check room code." });
       return;
     }
 
@@ -171,6 +173,7 @@ io.on("connection", (socket) => {
     const normalizedRoomCode = String(roomCode || "").toUpperCase();
     const room = rooms.get(normalizedRoomCode);
     if (!room) {
+      socket.emit("room:error", { message: "Room not found" });
       return;
     }
 

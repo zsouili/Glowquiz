@@ -68,6 +68,17 @@ export function subscribeRoomState(handler: (state: MultiplayerRoomState) => voi
   };
 }
 
+export function subscribeRoomErrors(handler: (message: string) => void): () => void {
+  const instance = getMultiplayerSocket();
+  const wrapped = (payload: { message?: string }) => {
+    handler(payload?.message || "Room error");
+  };
+  instance.on("room:error", wrapped);
+  return () => {
+    instance.off("room:error", wrapped);
+  };
+}
+
 export function createRoom(payload: JoinPayload): void {
   getMultiplayerSocket().emit("room:create", payload);
 }
