@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function QuizScreen({ quizType, onExit }: Props): JSX.Element {
-  const { language, t, theme, headingFont, bodyFont, isRTL, quizTypeLabel, username, avatar } =
+  const { language, t, theme, headingFont, bodyFont, isRTL, quizTypeLabel, username, avatar, profileColor } =
     useAppSettings();
   const { addResult } = useGame();
 
@@ -110,6 +110,11 @@ export function QuizScreen({ quizType, onExit }: Props): JSX.Element {
     setPointsDelta(-5);
     setScore((prev) => prev - 5);
     setFeedback(t("wrong"));
+
+    // Auto-advance when timer expires to keep fast-paced quiz flow.
+    setTimeout(() => {
+      void moveNext();
+    }, 750);
   }
 
   async function moveNext(): Promise<void> {
@@ -119,6 +124,7 @@ export function QuizScreen({ quizType, onExit }: Props): JSX.Element {
         await addResult({
           username,
           avatar,
+          profileColor,
           score,
           quizType
         });

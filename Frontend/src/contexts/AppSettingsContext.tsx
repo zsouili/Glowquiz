@@ -9,13 +9,15 @@ interface AppSettingsContextValue {
   themeMode: ThemeMode;
   username: string;
   avatar: string;
+  profileColor: string;
+  profilePalette: string[];
   isHydrated: boolean;
   isRTL: boolean;
   headingFont: string;
   bodyFont: string;
   setLanguage: (lang: Language) => Promise<void>;
   setThemeMode: (theme: ThemeMode) => Promise<void>;
-  setProfile: (username: string, avatar: string) => Promise<void>;
+  setProfile: (username: string, avatar: string, profileColor: string) => Promise<void>;
   t: (key: keyof typeof dictionary.en.ui) => string;
   quizTypeLabel: (type: QuizType) => string;
   theme: ReturnType<typeof getTheme>;
@@ -26,7 +28,20 @@ const STORAGE_KEYS = {
   themeMode: "glowquiz.themeMode",
   username: "glowquiz.username",
   avatar: "glowquiz.avatar"
+  ,
+  profileColor: "glowquiz.profileColor"
 };
+
+const PROFILE_PALETTE = [
+  "#7DF9FF",
+  "#FF7A59",
+  "#FFD166",
+  "#4ADE80",
+  "#F472B6",
+  "#60A5FA",
+  "#C084FC",
+  "#F97316"
+];
 
 function getTheme(mode: ThemeMode) {
   return themes[mode];
@@ -45,17 +60,19 @@ export function AppSettingsProvider({
   const [themeMode, setThemeModeState] = useState<ThemeMode>("dark");
   const [username, setUsername] = useState<string>("");
   const [avatar, setAvatar] = useState<string>("🎯");
+  const [profileColor, setProfileColor] = useState<string>("#7DF9FF");
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
 
   useEffect(() => {
     async function hydrate() {
       try {
-        const [storedLanguage, storedTheme, storedUsername, storedAvatar] =
+        const [storedLanguage, storedTheme, storedUsername, storedAvatar, storedProfileColor] =
           await AsyncStorage.multiGet([
             STORAGE_KEYS.language,
             STORAGE_KEYS.themeMode,
             STORAGE_KEYS.username,
-            STORAGE_KEYS.avatar
+            STORAGE_KEYS.avatar,
+            STORAGE_KEYS.profileColor
           ]);
 
         const lang = storedLanguage[1] as Language | null;
@@ -72,6 +89,9 @@ export function AppSettingsProvider({
         }
         if (storedAvatar[1]) {
           setAvatar(storedAvatar[1]);
+        }
+        if (storedProfileColor[1] && PROFILE_PALETTE.includes(storedProfileColor[1])) {
+          setProfileColor(storedProfileColor[1]);
         }
       } catch {
         // Keep default state if storage is unavailable.
@@ -93,12 +113,14 @@ export function AppSettingsProvider({
     await AsyncStorage.setItem(STORAGE_KEYS.themeMode, theme);
   }
 
-  async function setProfile(nextUsername: string, nextAvatar: string): Promise<void> {
+  async function setProfile(nextUsername: string, nextAvatar: string, nextProfileColor: string): Promise<void> {
     setUsername(nextUsername.trim());
     setAvatar(nextAvatar.trim() || "🎯");
+    setProfileColor(nextProfileColor);
     await AsyncStorage.multiSet([
       [STORAGE_KEYS.username, nextUsername.trim()],
-      [STORAGE_KEYS.avatar, nextAvatar.trim() || "🎯"]
+      [STORAGE_KEYS.avatar, nextAvatar.trim() || "🎯"],
+      [STORAGE_KEYS.profileColor, nextProfileColor]
     ]);
   }
 
@@ -108,6 +130,8 @@ export function AppSettingsProvider({
       themeMode,
       username,
       avatar,
+      profileColor,
+      profilePalette: PROFILE_PALETTE,
       isHydrated,
       isRTL: language === "ar",
       headingFont: language === "ar" ? "Cairo_700Bold" : "Baloo2_700Bold",
@@ -119,7 +143,7 @@ export function AppSettingsProvider({
       quizTypeLabel: (type) => dictionary[language].quizTypeNames[type],
       theme: getTheme(themeMode)
     };
-  }, [language, themeMode, username, avatar, isHydrated]);
+  }, [language, themeMode, username, avatar, profileColor, isHydrated]);
 
   return (
     <AppSettingsContext.Provider value={value}>

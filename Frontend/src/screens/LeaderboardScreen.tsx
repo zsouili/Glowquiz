@@ -1,17 +1,27 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { GlassPanel } from "../components/GlassPanel";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { useGame } from "../contexts/GameContext";
+import { LeaderboardPeriod } from "../types";
 
 interface Props {
   onBack: () => void;
 }
 
 export function LeaderboardScreen({ onBack }: Props): JSX.Element {
-  const { leaderboard } = useGame();
+  const { getLeaderboardByPeriod, syncLeaderboardFromServer } = useGame();
   const { t, theme, headingFont, bodyFont, isRTL } = useAppSettings();
+  const [period, setPeriod] = useState<LeaderboardPeriod>("all");
+
+  useEffect(() => {
+    void syncLeaderboardFromServer();
+    // Intentionally run once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const leaderboard = useMemo(() => getLeaderboardByPeriod(period), [getLeaderboardByPeriod, period]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -26,6 +36,27 @@ export function LeaderboardScreen({ onBack }: Props): JSX.Element {
         >
           {t("leaderboard")}
         </Text>
+
+        <View style={styles.periodRow}>
+          <PrimaryButton
+            label={t("daily")}
+            onPress={() => setPeriod("daily")}
+            variant={period === "daily" ? "solid" : "outline"}
+            style={styles.periodButton}
+          />
+          <PrimaryButton
+            label={t("weekly")}
+            onPress={() => setPeriod("weekly")}
+            variant={period === "weekly" ? "solid" : "outline"}
+            style={styles.periodButton}
+          />
+          <PrimaryButton
+            label={t("allTime")}
+            onPress={() => setPeriod("all")}
+            variant={period === "all" ? "solid" : "outline"}
+            style={styles.periodButton}
+          />
+        </View>
 
         {leaderboard.length === 0 && (
           <Text
@@ -57,7 +88,7 @@ export function LeaderboardScreen({ onBack }: Props): JSX.Element {
               </Text>
               <Text
                 style={{
-                  color: theme.textPrimary,
+                  color: entry.profileColor || theme.accent,
                   fontFamily: bodyFont,
                   flex: 1,
                   textAlign: isRTL ? "right" : "left"
@@ -97,5 +128,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6
+  },
+  periodRow: {
+    marginTop: 12,
+    flexDirection: "row",
+    gap: 8
+  },
+  periodButton: {
+    flex: 1
   }
 });

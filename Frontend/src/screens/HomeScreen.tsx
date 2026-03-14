@@ -11,6 +11,7 @@ interface Props {
   onStartQuiz: (quizType: QuizType) => void;
   onOpenSettings: () => void;
   onOpenLeaderboard: () => void;
+  onOpenMultiplayer: () => void;
 }
 
 const QUIZ_TYPES: QuizType[] = [
@@ -28,9 +29,10 @@ const QUIZ_TYPES: QuizType[] = [
 export function HomeScreen({
   onStartQuiz,
   onOpenSettings,
-  onOpenLeaderboard
+  onOpenLeaderboard,
+  onOpenMultiplayer
 }: Props): JSX.Element {
-  const { t, theme, headingFont, bodyFont, isRTL, username, avatar, quizTypeLabel, language } =
+  const { t, theme, headingFont, bodyFont, isRTL, username, avatar, profileColor, quizTypeLabel, language } =
     useAppSettings();
 
   const dailyQuestion = computeQuestionOfDay(QUESTIONS);
@@ -52,7 +54,7 @@ export function HomeScreen({
           style={{
             marginTop: 2,
             fontSize: 16,
-            color: theme.textSecondary,
+            color: profileColor,
             fontFamily: bodyFont,
             textAlign: isRTL ? "right" : "left"
           }}
@@ -69,6 +71,13 @@ export function HomeScreen({
             variant="outline"
           />
         </View>
+
+        <PrimaryButton
+          label={t("multiplayer")}
+          onPress={onOpenMultiplayer}
+          style={{ marginTop: 10 }}
+          variant="outline"
+        />
       </GlassPanel>
 
       <GlassPanel style={styles.dailyPanel}>

@@ -5,11 +5,12 @@ import { useAppSettings } from "../contexts/AppSettingsContext";
 import { QuizType } from "../types";
 import { HomeScreen } from "./HomeScreen";
 import { LeaderboardScreen } from "./LeaderboardScreen";
+import { MultiplayerScreen } from "./MultiplayerScreen";
 import { QuizScreen } from "./QuizScreen";
 import { SettingsScreen } from "./SettingsScreen";
 import { WelcomeScreen } from "./WelcomeScreen";
 
-type Screen = "welcome" | "home" | "quiz" | "settings" | "leaderboard";
+type Screen = "welcome" | "home" | "quiz" | "settings" | "leaderboard" | "multiplayer";
 
 export function Root(): JSX.Element {
   const { isHydrated, themeMode, username } = useAppSettings();
@@ -53,6 +54,7 @@ export function Root(): JSX.Element {
             }}
             onOpenSettings={() => setScreen("settings")}
             onOpenLeaderboard={() => setScreen("leaderboard")}
+            onOpenMultiplayer={() => setScreen("multiplayer")}
           />
         )}
 
@@ -69,6 +71,10 @@ export function Root(): JSX.Element {
 
         {activeScreen === "leaderboard" && (
           <LeaderboardScreen onBack={() => setScreen("home")} />
+        )}
+
+        {activeScreen === "multiplayer" && (
+          <MultiplayerScreen onBack={() => setScreen("home")} />
         )}
       </View>
     </SafeAreaView>

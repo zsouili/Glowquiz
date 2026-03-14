@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   I18nManager,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -26,17 +27,20 @@ export function WelcomeScreen({ onContinue }: Props): JSX.Element {
     theme,
     isRTL,
     username,
-    avatar
+    avatar,
+    profileColor,
+    profilePalette
   } = useAppSettings();
 
   const [localName, setLocalName] = useState(username);
   const [localAvatar, setLocalAvatar] = useState(avatar || "🎯");
+  const [localProfileColor, setLocalProfileColor] = useState(profileColor);
 
   async function handleContinue(): Promise<void> {
     if (!localName.trim()) {
       return;
     }
-    await setProfile(localName, localAvatar);
+    await setProfile(localName, localAvatar, localProfileColor);
     onContinue();
   }
 
@@ -141,6 +145,38 @@ export function WelcomeScreen({ onContinue }: Props): JSX.Element {
             }
           ]}
         >
+          {t("profileColor")}
+        </Text>
+        <View style={styles.paletteRow}>
+          {profilePalette.map((color) => {
+            const selected = color === localProfileColor;
+            return (
+              <Pressable
+                key={color}
+                onPress={() => setLocalProfileColor(color)}
+                style={[
+                  styles.colorSwatch,
+                  {
+                    backgroundColor: color,
+                    borderColor: selected ? theme.textPrimary : theme.border,
+                    borderWidth: selected ? 2 : 1
+                  }
+                ]}
+              />
+            );
+          })}
+        </View>
+
+        <Text
+          style={[
+            styles.label,
+            {
+              color: theme.textPrimary,
+              fontFamily: bodyFont,
+              textAlign: isRTL ? "right" : "left"
+            }
+          ]}
+        >
           {t("avatarEmoji")}
         </Text>
         <TextInput
@@ -214,6 +250,17 @@ const styles = StyleSheet.create({
     minHeight: 46,
     paddingHorizontal: 12,
     marginBottom: 14
+  },
+  paletteRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 14
+  },
+  colorSwatch: {
+    width: 28,
+    height: 28,
+    borderRadius: 999
   },
   startButton: {
     marginTop: 4

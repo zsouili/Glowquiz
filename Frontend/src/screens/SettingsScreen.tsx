@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { GlassPanel } from "../components/GlassPanel";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { useAppSettings } from "../contexts/AppSettingsContext";
@@ -22,17 +22,20 @@ export function SettingsScreen({ onBack }: Props): JSX.Element {
     isRTL,
     username,
     avatar,
-    setProfile
+    setProfile,
+    profileColor,
+    profilePalette
   } = useAppSettings();
 
   const [localName, setLocalName] = useState(username);
   const [localAvatar, setLocalAvatar] = useState(avatar);
+  const [localProfileColor, setLocalProfileColor] = useState(profileColor);
 
   async function handleSaveProfile(): Promise<void> {
     if (!localName.trim()) {
       return;
     }
-    await setProfile(localName, localAvatar);
+    await setProfile(localName, localAvatar, localProfileColor);
   }
 
   async function handleSetTheme(mode: ThemeMode): Promise<void> {
@@ -147,6 +150,34 @@ export function SettingsScreen({ onBack }: Props): JSX.Element {
           maxLength={2}
         />
 
+        <Text
+          style={[
+            styles.label,
+            { color: theme.textPrimary, fontFamily: bodyFont, textAlign: isRTL ? "right" : "left" }
+          ]}
+        >
+          {t("profileColor")}
+        </Text>
+        <View style={styles.paletteRow}>
+          {profilePalette.map((color) => {
+            const selected = color === localProfileColor;
+            return (
+              <Pressable
+                key={color}
+                onPress={() => setLocalProfileColor(color)}
+                style={[
+                  styles.colorSwatch,
+                  {
+                    backgroundColor: color,
+                    borderColor: selected ? theme.textPrimary : theme.border,
+                    borderWidth: selected ? 2 : 1
+                  }
+                ]}
+              />
+            );
+          })}
+        </View>
+
         <PrimaryButton label={t("saveProfile")} onPress={handleSaveProfile} />
 
         <Text
@@ -208,5 +239,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 12
+  },
+  paletteRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 6
+  },
+  colorSwatch: {
+    width: 28,
+    height: 28,
+    borderRadius: 999
   }
 });

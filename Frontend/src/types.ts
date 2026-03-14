@@ -40,7 +40,26 @@ export interface LeaderboardEntry {
   id: string;
   username: string;
   avatar: string;
+  profileColor: string;
   score: number;
   dateISO: string;
   quizType: QuizType;
+}
+
+export type LeaderboardPeriod = "daily" | "weekly" | "all";
+
+export interface MultiplayerPlayer {
+  id: string;
+  username: string;
+  avatar: string;
+  profileColor: string;
+  score: number;
+  isHost: boolean;
+}
+
+export interface MultiplayerRoomState {
+  roomCode: string;
+  quizType: QuizType;
+  players: MultiplayerPlayer[];
+  status: "lobby" | "in_game" | "finished";
 }

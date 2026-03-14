@@ -35,6 +35,22 @@ interface UIStrings {
   developedBy: string;
   dailyChallenge: string;
   saveSettings: string;
+  profileColor: string;
+  multiplayer: string;
+  createRoom: string;
+  joinRoom: string;
+  roomCode: string;
+  roomCodePlaceholder: string;
+  connect: string;
+  leaveRoom: string;
+  startMatch: string;
+  waitingPlayers: string;
+  lobby: string;
+  liveScores: string;
+  emojiReaction: string;
+  daily: string;
+  weekly: string;
+  allTime: string;
 }
 
 interface Dictionary {
@@ -78,7 +94,23 @@ export const dictionary: Record<Language, Dictionary> = {
       noLeaderboardYet: "No scores yet. Play a quiz to appear here!",
       developedBy: "Developed by ZaydSouili-ESISA",
       dailyChallenge: "Daily Challenge",
-      saveSettings: "Saved automatically"
+      saveSettings: "Saved automatically",
+      profileColor: "Profile Color",
+      multiplayer: "Online Multiplayer",
+      createRoom: "Create Room",
+      joinRoom: "Join Room",
+      roomCode: "Room Code",
+      roomCodePlaceholder: "Enter room code",
+      connect: "Connect",
+      leaveRoom: "Leave Room",
+      startMatch: "Start Match",
+      waitingPlayers: "Waiting for players...",
+      lobby: "Lobby",
+      liveScores: "Live Scores",
+      emojiReaction: "Emoji Reaction",
+      daily: "Daily",
+      weekly: "Weekly",
+      allTime: "All-time"
     },
     quizTypeNames: {
       emoji: "Guess the Emoji",
@@ -127,7 +159,23 @@ export const dictionary: Record<Language, Dictionary> = {
       noLeaderboardYet: "لا توجد نتائج بعد. العب لتظهر هنا!",
       developedBy: "Developed by ZaydSouili-ESISA",
       dailyChallenge: "تحدي اليوم",
-      saveSettings: "يتم الحفظ تلقائيا"
+      saveSettings: "يتم الحفظ تلقائيا",
+      profileColor: "لون الملف الشخصي",
+      multiplayer: "طور اللعب الجماعي",
+      createRoom: "إنشاء غرفة",
+      joinRoom: "الانضمام لغرفة",
+      roomCode: "رمز الغرفة",
+      roomCodePlaceholder: "أدخل رمز الغرفة",
+      connect: "اتصال",
+      leaveRoom: "مغادرة الغرفة",
+      startMatch: "ابدأ المباراة",
+      waitingPlayers: "في انتظار اللاعبين...",
+      lobby: "الردهة",
+      liveScores: "النتائج المباشرة",
+      emojiReaction: "رد فعل إيموجي",
+      daily: "يومي",
+      weekly: "أسبوعي",
+      allTime: "كل الوقت"
     },
     quizTypeNames: {
       emoji: "خمن الإيموجي",
