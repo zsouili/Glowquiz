@@ -10,7 +10,7 @@ import { GlassPanel } from "../components/GlassPanel";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { useGame } from "../contexts/GameContext";
-import { QUESTIONS } from "../data/questions";
+import { QUESTIONS } from "@/data/questions";
 import { QuizQuestion, QuizType } from "../types";
 import { getTimerForQuestion, shuffleQuestions } from "../utils/quizHelpers";
 

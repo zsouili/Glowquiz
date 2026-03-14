@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { GlassPanel } from "../components/GlassPanel";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { useAppSettings } from "../contexts/AppSettingsContext";
-import { QUESTIONS } from "../data/questions";
+import { QUESTIONS } from "@/data/questions";
 import { QuizType } from "../types";
 import { computeQuestionOfDay } from "../utils/quizHelpers";
 
