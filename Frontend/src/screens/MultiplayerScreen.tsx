@@ -14,6 +14,7 @@ import {
   subscribeConnectionStatus,
   subscribeRoomState
 } from "../services/multiplayerSocket";
+import { hasCustomBackendUrl } from "../services/backendConfig";
 
 interface Props {
   onBack: () => void;
@@ -122,6 +123,11 @@ export function MultiplayerScreen({ onBack }: Props): JSX.Element {
         <Text style={{ color: theme.textSecondary, fontFamily: bodyFont, fontSize: 12 }}>
           Server: {getMultiplayerUrl()}
         </Text>
+        {!isConnected && !hasCustomBackendUrl() ? (
+          <Text style={{ color: theme.textSecondary, fontFamily: bodyFont, fontSize: 12, marginTop: 4 }}>
+            Tip: set EXPO_PUBLIC_BACKEND_URL to your backend public URL.
+          </Text>
+        ) : null}
         {connectionMessage ? (
           <Text style={{ color: theme.danger, fontFamily: bodyFont, marginTop: 4 }}>{connectionMessage}</Text>
         ) : null}

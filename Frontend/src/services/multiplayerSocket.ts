@@ -22,8 +22,10 @@ interface JoinPayload {
 export function getMultiplayerSocket(): Socket {
   if (!socket) {
     socket = io(MULTIPLAYER_URL, {
-      transports: ["websocket"],
-      autoConnect: true
+      autoConnect: true,
+      reconnection: true,
+      reconnectionAttempts: 8,
+      timeout: 10000
     });
   }
   if (!socket.connected) {
