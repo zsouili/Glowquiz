@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { GlassPanel } from "../components/GlassPanel";
 import { PrimaryButton } from "../components/PrimaryButton";
@@ -11,15 +11,9 @@ interface Props {
 }
 
 export function LeaderboardScreen({ onBack }: Props): JSX.Element {
-  const { getLeaderboardByPeriod, syncLeaderboardFromServer } = useGame();
+  const { getLeaderboardByPeriod } = useGame();
   const { t, theme, headingFont, bodyFont, isRTL } = useAppSettings();
   const [period, setPeriod] = useState<LeaderboardPeriod>("all");
-
-  useEffect(() => {
-    void syncLeaderboardFromServer();
-    // Intentionally run once on mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const leaderboard = useMemo(() => getLeaderboardByPeriod(period), [getLeaderboardByPeriod, period]);
 

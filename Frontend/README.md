@@ -11,7 +11,6 @@ A fun bilingual (English/Arabic) React Native quiz game built with Expo.
 - Animated floating particles and smooth transitions
 - Scoring, feedback, timers, random order, and leaderboard
 - Question of the day and optional avatar emoji
-- Online multiplayer room structure with live player scores (Socket.IO backend)
 - Daily / weekly / all-time leaderboard filters
 
 ## Run
@@ -36,15 +35,3 @@ npm run build:web
 ```
 
 The generated static web output is in `dist`.
-
-## Backend (for Multiplayer + Leaderboard Sync)
-
-From the workspace root:
-
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-Backend runs on `http://localhost:4000`.

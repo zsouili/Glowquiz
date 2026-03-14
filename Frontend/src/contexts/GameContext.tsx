@@ -1,12 +1,10 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LeaderboardEntry, LeaderboardPeriod, QuizType } from "../types";
-import { getBackendBaseUrl } from "../services/backendConfig";
 
 interface GameContextValue {
   leaderboard: LeaderboardEntry[];
   getLeaderboardByPeriod: (period: LeaderboardPeriod) => LeaderboardEntry[];
-  syncLeaderboardFromServer: () => Promise<void>;
   addResult: (payload: {
     username: string;
     avatar: string;
@@ -17,7 +15,6 @@ interface GameContextValue {
 }
 
 const LEADERBOARD_KEY = "glowquiz.leaderboard";
-const API_BASE_URL = getBackendBaseUrl();
 
 function periodStartDate(period: LeaderboardPeriod): Date {
   const now = new Date();
@@ -87,34 +84,6 @@ export function GameProvider({ children }: { children: React.ReactNode }): JSX.E
 
     setLeaderboard(next);
     await AsyncStorage.setItem(LEADERBOARD_KEY, JSON.stringify(next));
-
-    // Best effort remote sync. App still works offline if backend is unavailable.
-    try {
-      await fetch(`${API_BASE_URL}/api/leaderboard`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(entry)
-      });
-    } catch {
-      // no-op: keep local-first leaderboard flow
-    }
-  }
-
-  async function syncLeaderboardFromServer(): Promise<void> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/leaderboard?period=all`);
-      if (!response.ok) {
-        return;
-      }
-      const data = (await response.json()) as LeaderboardEntry[];
-      if (!Array.isArray(data)) {
-        return;
-      }
-      setLeaderboard(data);
-      await AsyncStorage.setItem(LEADERBOARD_KEY, JSON.stringify(data));
-    } catch {
-      // Keep local cache when server is offline.
-    }
   }
 
   function getLeaderboardByPeriod(period: LeaderboardPeriod): LeaderboardEntry[] {
@@ -128,7 +97,6 @@ export function GameProvider({ children }: { children: React.ReactNode }): JSX.E
     return {
       leaderboard,
       getLeaderboardByPeriod,
-      syncLeaderboardFromServer,
       addResult
     };
   }, [leaderboard]);
