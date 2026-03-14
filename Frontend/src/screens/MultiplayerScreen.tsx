@@ -6,10 +6,12 @@ import { useAppSettings } from "../contexts/AppSettingsContext";
 import { MultiplayerRoomState, QuizType } from "../types";
 import {
   createRoom,
+  getMultiplayerUrl,
   joinRoom,
   leaveRoom,
   sendReaction,
   startMatch,
+  subscribeConnectionStatus,
   subscribeRoomState
 } from "../services/multiplayerSocket";
 
@@ -32,19 +34,40 @@ const QUIZ_TYPES: QuizType[] = [
 ];
 
 export function MultiplayerScreen({ onBack }: Props): JSX.Element {
-  const { t, theme, bodyFont, headingFont, username, avatar, profileColor, quizTypeLabel, isRTL } =
+  const { t, theme, bodyFont, headingFont, username, avatar, profileColor, clientId, quizTypeLabel, isRTL } =
     useAppSettings();
 
   const [roomCodeInput, setRoomCodeInput] = useState("");
   const [selectedType, setSelectedType] = useState<QuizType>("rapid_fire");
   const [roomState, setRoomState] = useState<MultiplayerRoomState | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionMessage, setConnectionMessage] = useState("");
 
-  const playerId = useMemo(() => `${username}-${avatar}`, [username, avatar]);
+  const playerId = useMemo(() => clientId, [clientId]);
 
   useEffect(() => {
     const unsubscribe = subscribeRoomState((state) => {
       setRoomState(state);
     });
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = subscribeConnectionStatus(
+      () => {
+        setIsConnected(true);
+        setConnectionMessage("");
+      },
+      () => {
+        setIsConnected(false);
+        setConnectionMessage("Disconnected from multiplayer server");
+      },
+      (message) => {
+        setIsConnected(false);
+        setConnectionMessage(message || "Unable to connect");
+      }
+    );
 
     return unsubscribe;
   }, []);
@@ -92,6 +115,16 @@ export function MultiplayerScreen({ onBack }: Props): JSX.Element {
         >
           {t("multiplayer")}
         </Text>
+
+        <Text style={{ color: isConnected ? theme.success : theme.danger, fontFamily: bodyFont, marginTop: 8 }}>
+          {isConnected ? "Connected" : "Not connected"}
+        </Text>
+        <Text style={{ color: theme.textSecondary, fontFamily: bodyFont, fontSize: 12 }}>
+          Server: {getMultiplayerUrl()}
+        </Text>
+        {connectionMessage ? (
+          <Text style={{ color: theme.danger, fontFamily: bodyFont, marginTop: 4 }}>{connectionMessage}</Text>
+        ) : null}
 
         {!roomState && (
           <>

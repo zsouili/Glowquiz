@@ -1,7 +1,8 @@
 import { io, Socket } from "socket.io-client";
 import { MultiplayerRoomState, QuizType } from "../types";
+import { getBackendBaseUrl } from "./backendConfig";
 
-const MULTIPLAYER_URL = "http://localhost:4000";
+const MULTIPLAYER_URL = getBackendBaseUrl();
 
 let socket: Socket | null = null;
 
@@ -20,9 +21,41 @@ interface JoinPayload {
 
 export function getMultiplayerSocket(): Socket {
   if (!socket) {
-    socket = io(MULTIPLAYER_URL, { transports: ["websocket"] });
+    socket = io(MULTIPLAYER_URL, {
+      transports: ["websocket"],
+      autoConnect: true
+    });
+  }
+  if (!socket.connected) {
+    socket.connect();
   }
   return socket;
+}
+
+export function getMultiplayerUrl(): string {
+  return MULTIPLAYER_URL;
+}
+
+export function subscribeConnectionStatus(
+  onConnected: () => void,
+  onDisconnected: () => void,
+  onError: (message: string) => void
+): () => void {
+  const instance = getMultiplayerSocket();
+
+  const handleConnect = () => onConnected();
+  const handleDisconnect = () => onDisconnected();
+  const handleError = (error: Error) => onError(error.message || "Connection error");
+
+  instance.on("connect", handleConnect);
+  instance.on("disconnect", handleDisconnect);
+  instance.on("connect_error", handleError);
+
+  return () => {
+    instance.off("connect", handleConnect);
+    instance.off("disconnect", handleDisconnect);
+    instance.off("connect_error", handleError);
+  };
 }
 
 export function subscribeRoomState(handler: (state: MultiplayerRoomState) => void): () => void {

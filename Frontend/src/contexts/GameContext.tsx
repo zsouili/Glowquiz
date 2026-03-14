@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LeaderboardEntry, LeaderboardPeriod, QuizType } from "../types";
+import { getBackendBaseUrl } from "../services/backendConfig";
 
 interface GameContextValue {
   leaderboard: LeaderboardEntry[];
@@ -16,6 +17,7 @@ interface GameContextValue {
 }
 
 const LEADERBOARD_KEY = "glowquiz.leaderboard";
+const API_BASE_URL = getBackendBaseUrl();
 
 function periodStartDate(period: LeaderboardPeriod): Date {
   const now = new Date();
@@ -88,7 +90,7 @@ export function GameProvider({ children }: { children: React.ReactNode }): JSX.E
 
     // Best effort remote sync. App still works offline if backend is unavailable.
     try {
-      await fetch("http://localhost:4000/api/leaderboard", {
+      await fetch(`${API_BASE_URL}/api/leaderboard`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(entry)
@@ -100,7 +102,7 @@ export function GameProvider({ children }: { children: React.ReactNode }): JSX.E
 
   async function syncLeaderboardFromServer(): Promise<void> {
     try {
-      const response = await fetch("http://localhost:4000/api/leaderboard?period=all");
+      const response = await fetch(`${API_BASE_URL}/api/leaderboard?period=all`);
       if (!response.ok) {
         return;
       }

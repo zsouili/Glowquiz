@@ -10,6 +10,7 @@ interface AppSettingsContextValue {
   username: string;
   avatar: string;
   profileColor: string;
+  clientId: string;
   profilePalette: string[];
   isHydrated: boolean;
   isRTL: boolean;
@@ -29,7 +30,8 @@ const STORAGE_KEYS = {
   username: "glowquiz.username",
   avatar: "glowquiz.avatar"
   ,
-  profileColor: "glowquiz.profileColor"
+  profileColor: "glowquiz.profileColor",
+  clientId: "glowquiz.clientId"
 };
 
 const PROFILE_PALETTE = [
@@ -61,18 +63,20 @@ export function AppSettingsProvider({
   const [username, setUsername] = useState<string>("");
   const [avatar, setAvatar] = useState<string>("🎯");
   const [profileColor, setProfileColor] = useState<string>("#7DF9FF");
+  const [clientId, setClientId] = useState<string>("");
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
 
   useEffect(() => {
     async function hydrate() {
       try {
-        const [storedLanguage, storedTheme, storedUsername, storedAvatar, storedProfileColor] =
+        const [storedLanguage, storedTheme, storedUsername, storedAvatar, storedProfileColor, storedClientId] =
           await AsyncStorage.multiGet([
             STORAGE_KEYS.language,
             STORAGE_KEYS.themeMode,
             STORAGE_KEYS.username,
             STORAGE_KEYS.avatar,
-            STORAGE_KEYS.profileColor
+            STORAGE_KEYS.profileColor,
+            STORAGE_KEYS.clientId
           ]);
 
         const lang = storedLanguage[1] as Language | null;
@@ -92,6 +96,14 @@ export function AppSettingsProvider({
         }
         if (storedProfileColor[1] && PROFILE_PALETTE.includes(storedProfileColor[1])) {
           setProfileColor(storedProfileColor[1]);
+        }
+
+        if (storedClientId[1]) {
+          setClientId(storedClientId[1]);
+        } else {
+          const generated = `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+          setClientId(generated);
+          await AsyncStorage.setItem(STORAGE_KEYS.clientId, generated);
         }
       } catch {
         // Keep default state if storage is unavailable.
@@ -131,6 +143,7 @@ export function AppSettingsProvider({
       username,
       avatar,
       profileColor,
+      clientId,
       profilePalette: PROFILE_PALETTE,
       isHydrated,
       isRTL: language === "ar",
@@ -143,7 +156,7 @@ export function AppSettingsProvider({
       quizTypeLabel: (type) => dictionary[language].quizTypeNames[type],
       theme: getTheme(themeMode)
     };
-  }, [language, themeMode, username, avatar, profileColor, isHydrated]);
+  }, [language, themeMode, username, avatar, profileColor, clientId, isHydrated]);
 
   return (
     <AppSettingsContext.Provider value={value}>
